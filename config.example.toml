@@ -1,0 +1,25 @@
+# 首次加载插件时复制到用户数据目录的运行时配置。
+# 这里只放可以安全修改的默认值；插件 id / 名称 / 版本等元数据仍以 plugin.toml 为准。
+
+[plugin_runtime]
+enabled = true
+auto_start = true
+
+[git_memory]
+memory_dir = ""
+remote_name = "origin"
+branch = "main"
+commit_message = "chore(memory): sync {timestamp}"
+author_name = ""
+author_email = ""
+provider = ""
+repository = ""
+provider_base_url = ""
+auto_sync_enabled = false
+auto_sync_interval_minutes = 30
+pull_before_push = true
+merge_strategy = "ours"
+proxy_url = ""
+notify_on_error = true
+gitignore_preset = "default"
+gitignore_extra = ""

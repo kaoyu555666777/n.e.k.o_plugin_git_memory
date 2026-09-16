@@ -1,0 +1,72 @@
+[plugin]
+type = "plugin"
+id = "git_memory"
+name = "Git 记忆同步"
+description = "使用 GitPython 把 N.E.K.O 的记忆目录同步到 GitHub / GitLab / Gitee 的私有仓库，支持定时自动同步与手动同步。"
+short_description = "用 Git 把记忆目录备份并同步到 GitHub / GitLab / Gitee 私有仓库。"
+
+version = "0.1.0"
+entry = "plugin.plugins.git_memory:GitMemoryPlugin"
+
+[plugin.sdk]
+recommended = ">=0.1.0,<0.2.0"
+supported = ">=0.1.0,<0.3.0"
+
+[plugin.i18n]
+default_locale = "zh-CN"
+locales_dir = "i18n"
+
+[plugin.ui]
+enabled = true
+
+[[plugin.ui.panel]]
+id = "main"
+title = "Git 记忆同步"
+entry = "ui/panel.tsx"
+mode = "hosted-tsx"
+context = "dashboard"
+permissions = ["state:read", "action:call"]
+
+[[plugin.ui.guide]]
+id = "quickstart"
+title = "快速开始"
+entry = "docs/quickstart.md"
+permissions = ["state:read"]
+
+[plugin_runtime]
+enabled = true
+auto_start = true
+
+[git_memory]
+# 记忆目录。留空表示自动使用「软件存储目录/memory」。
+memory_dir = ""
+# 远端名称与分支。
+remote_name = "origin"
+branch = "main"
+# 提交信息模板，支持 {timestamp} / {date} / {time} / {hostname} / {count}。
+commit_message = "chore(memory): sync {timestamp}"
+# 提交作者。留空时使用 Git 全局配置。
+author_name = ""
+author_email = ""
+# 最近一次选择的代码托管平台（github / gitlab / gitee）。
+provider = ""
+# 已关联的仓库全名，例如 owner/name。
+repository = ""
+# 自建 GitLab / Gitee 的站点地址，留空使用官方站点。
+provider_base_url = ""
+# 自动同步。
+auto_sync_enabled = false
+# 可选值：5 / 10 / 30 / 60（分钟）。
+auto_sync_interval_minutes = 30
+# 推送前先拉取远端。
+pull_before_push = true
+# 与远端历史冲突时的处理方式：ours（保留本地记忆）/ abort（中止并提示）。
+merge_strategy = "ours"
+# 网络代理，留空跟随系统环境变量。
+proxy_url = ""
+# 自动同步失败时通过 HUD 提醒。
+notify_on_error = true
+# 初始化仓库时写入的 .gitignore 预设：default / minimal / none。
+gitignore_preset = "default"
+# 追加到 .gitignore 的自定义规则。
+gitignore_extra = ""
