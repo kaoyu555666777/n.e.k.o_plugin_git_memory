@@ -12,7 +12,10 @@ INTERVAL_OPTIONS: tuple[int, ...] = (5, 10, 30, 60)
 DEFAULT_INTERVAL = 30
 MIN_INTERVAL = 1
 MAX_INTERVAL = 1440
-MERGE_STRATEGIES: tuple[str, ...] = ("ours", "abort")
+# 远端仓库出现本地没有的提交时怎么办：每次询问 / 自动保留本地 / 自动保留远端。
+REMOTE_UPDATE_POLICIES: tuple[str, ...] = ("ask", "keep_local", "keep_remote")
+# git 用哪个代理：auto（跟随插件设置/应用环境/系统代理）/ manual（只用填写的地址）/ off（直连）。
+PROXY_MODES: tuple[str, ...] = ("auto", "manual", "off")
 GITIGNORE_PRESETS: tuple[str, ...] = ("default", "minimal", "none")
 
 GITIGNORE_TEMPLATES: dict[str, str] = {
@@ -51,8 +54,9 @@ class GitMemorySettings:
     auto_sync_enabled: bool = False
     auto_sync_interval_minutes: int = DEFAULT_INTERVAL
     pull_before_push: bool = True
-    merge_strategy: str = "ours"
+    remote_update_policy: str = "ask"
     proxy_url: str = ""
+    proxy_mode: str = "auto"
     notify_on_error: bool = True
     gitignore_preset: str = "default"
     gitignore_extra: str = ""
@@ -135,9 +139,12 @@ def validate_settings(settings: GitMemorySettings) -> tuple[GitMemorySettings, l
         warnings.append("自动同步间隔超出范围，已恢复为 30 分钟。")
         data["auto_sync_interval_minutes"] = DEFAULT_INTERVAL
 
-    if data["merge_strategy"] not in MERGE_STRATEGIES:
-        warnings.append("冲突处理方式不支持，已恢复为 ours。")
-        data["merge_strategy"] = "ours"
+    if data["remote_update_policy"] not in REMOTE_UPDATE_POLICIES:
+        warnings.append("远端更新处理方式不支持，已恢复为每次询问。")
+        data["remote_update_policy"] = "ask"
+    if data["proxy_mode"] not in PROXY_MODES:
+        warnings.append("代理模式不支持，已恢复为自动。")
+        data["proxy_mode"] = "auto"
     if data["gitignore_preset"] not in GITIGNORE_PRESETS:
         warnings.append("gitignore 预设不支持，已恢复为 default。")
         data["gitignore_preset"] = "default"
@@ -183,7 +190,8 @@ __all__ = [
     "GITIGNORE_PRESETS",
     "GITIGNORE_TEMPLATES",
     "INTERVAL_OPTIONS",
-    "MERGE_STRATEGIES",
+    "REMOTE_UPDATE_POLICIES",
+    "PROXY_MODES",
     "GitMemorySettings",
     "build_gitignore",
     "render_commit_message",

@@ -1,0 +1,1754 @@
+{
+  "build_env": {
+    "arch": "AMD64",
+    "os": "win32",
+    "python": "3.11"
+  },
+  "entries": [
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.status.description",
+        "default": "返回 memory 目录当前的 Git 状态、远端配置与最近一次同步结果。"
+      },
+      "event_key": "git_memory.memory_sync_status",
+      "event_type": "plugin_entry",
+      "id": "memory_sync_status",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.status.name",
+        "default": "查看记忆同步状态"
+      },
+      "return_message": "",
+      "timeout": 60.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.sync.description",
+        "default": "把 memory 目录的改动提交并推送到已关联的 Git 私有仓库。"
+      },
+      "event_key": "git_memory.sync_memory_now",
+      "event_type": "plugin_entry",
+      "id": "sync_memory_now",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.sync.name",
+        "default": "同步记忆到 Git"
+      },
+      "return_message": "",
+      "timeout": 300.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.check.description",
+        "default": "重新检测 Git、操作系统与 memory 目录的仓库状态。"
+      },
+      "event_key": "git_memory.ui_check_environment",
+      "event_type": "plugin_entry",
+      "id": "ui_check_environment",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.check.name",
+        "default": "重新检测 Git 环境"
+      },
+      "return_message": "",
+      "timeout": 60.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.clearToken.description",
+        "default": "删除插件私有目录中保存的访问令牌。"
+      },
+      "event_key": "git_memory.ui_clear_token",
+      "event_type": "plugin_entry",
+      "id": "ui_clear_token",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.clearToken.name",
+        "default": "清除访问令牌"
+      },
+      "return_message": "",
+      "timeout": 30.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.connect.description",
+        "default": "把 memory 目录关联到选定的已有仓库，并立即执行一次同步。"
+      },
+      "event_key": "git_memory.ui_connect_repository",
+      "event_type": "plugin_entry",
+      "id": "ui_connect_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "clone_url": {
+            "type": "string"
+          },
+          "repository": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "repository"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.connect.name",
+        "default": "关联已有仓库"
+      },
+      "return_message": "",
+      "timeout": 300.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.create.description",
+        "default": "在选定的代码托管平台上创建私有仓库，关联 memory 目录并立即同步。"
+      },
+      "event_key": "git_memory.ui_create_repository",
+      "event_type": "plugin_entry",
+      "id": "ui_create_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "private": {
+            "default": true,
+            "type": "boolean"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "name"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.create.name",
+        "default": "创建私有仓库并关联"
+      },
+      "return_message": "",
+      "timeout": 300.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.disconnect.description",
+        "default": "移除 memory 仓库的远端配置，本地提交历史与文件保持不变。"
+      },
+      "event_key": "git_memory.ui_disconnect_repository",
+      "event_type": "plugin_entry",
+      "id": "ui_disconnect_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "remove_token": {
+            "default": false,
+            "type": "boolean"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.disconnect.name",
+        "default": "解除远端关联"
+      },
+      "return_message": "",
+      "timeout": 60.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.init.description",
+        "default": "在 memory 目录中执行 git init，并写入 .gitignore 与提交身份。"
+      },
+      "event_key": "git_memory.ui_init_repository",
+      "event_type": "plugin_entry",
+      "id": "ui_init_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "author_email": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "gitignore_preset": {
+            "enum": [
+              "default",
+              "minimal",
+              "none"
+            ],
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.init.name",
+        "default": "初始化 memory 仓库"
+      },
+      "return_message": "",
+      "timeout": 120.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.keepLocal.description",
+        "default": "用本地 memory 目录的版本覆盖远端仓库。"
+      },
+      "event_key": "git_memory.ui_keep_local_version",
+      "event_type": "plugin_entry",
+      "id": "ui_keep_local_version",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.keepLocal.name",
+        "default": "保留本地记忆版本"
+      },
+      "return_message": "",
+      "timeout": 300.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.keepRemote.description",
+        "default": "用远端仓库的版本覆盖本地 memory 目录。"
+      },
+      "event_key": "git_memory.ui_keep_remote_version",
+      "event_type": "plugin_entry",
+      "id": "ui_keep_remote_version",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.keepRemote.name",
+        "default": "保留远端记忆版本"
+      },
+      "return_message": "",
+      "timeout": 300.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.list.description",
+        "default": "列出访问令牌可写的仓库，供用户选择关联。"
+      },
+      "event_key": "git_memory.ui_list_repositories",
+      "event_type": "plugin_entry",
+      "id": "ui_list_repositories",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_url": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.list.name",
+        "default": "列出账号仓库"
+      },
+      "return_message": "",
+      "timeout": 90.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.saveSettings.description",
+        "default": "保存分支、提交信息模板、作者、代理、冲突策略与自动同步间隔等设置。"
+      },
+      "event_key": "git_memory.ui_save_settings",
+      "event_type": "plugin_entry",
+      "id": "ui_save_settings",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "settings": {
+            "type": "object"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.saveSettings.name",
+        "default": "保存 Git 同步设置"
+      },
+      "return_message": "",
+      "timeout": 60.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.token.description",
+        "default": "使用访问令牌调用代码托管平台接口校验账号，并加密保存到插件私有目录。"
+      },
+      "event_key": "git_memory.ui_save_token",
+      "event_type": "plugin_entry",
+      "id": "ui_save_token",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_url": {
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "github",
+              "gitlab",
+              "gitee"
+            ],
+            "type": "string"
+          },
+          "token": {
+            "minLength": 8,
+            "type": "string",
+            "writeOnly": true
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "provider",
+          "token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.token.name",
+        "default": "校验并保存访问令牌"
+      },
+      "return_message": "",
+      "timeout": 90.0
+    },
+    {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.autoSync.description",
+        "default": "开启或关闭自动同步，并设置 5 / 10 / 30 / 60 分钟的同步间隔。"
+      },
+      "event_key": "git_memory.ui_set_auto_sync",
+      "event_type": "plugin_entry",
+      "id": "ui_set_auto_sync",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "interval_minutes": {
+            "maximum": 1440,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "llm_result_fields": [],
+      "llm_result_schema": {},
+      "metadata": {},
+      "model_validate": true,
+      "name": {
+        "$i18n": "entry.autoSync.name",
+        "default": "设置自动同步"
+      },
+      "return_message": "",
+      "timeout": 60.0
+    }
+  ],
+  "entries_config_sha256": "",
+  "entry_methods": {
+    "memory_sync_status": "memory_sync_status",
+    "sync_memory_now": "sync_memory_now",
+    "ui_check_environment": "ui_check_environment",
+    "ui_clear_token": "ui_clear_token",
+    "ui_connect_repository": "ui_connect_repository",
+    "ui_create_repository": "ui_create_repository",
+    "ui_disconnect_repository": "ui_disconnect_repository",
+    "ui_init_repository": "ui_init_repository",
+    "ui_keep_local_version": "ui_keep_local_version",
+    "ui_keep_remote_version": "ui_keep_remote_version",
+    "ui_list_repositories": "ui_list_repositories",
+    "ui_save_settings": "ui_save_settings",
+    "ui_save_token": "ui_save_token",
+    "ui_set_auto_sync": "ui_set_auto_sync"
+  },
+  "handlers": {
+    "git_memory.memory_sync_status": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.status.description",
+        "default": "返回 memory 目录当前的 Git 状态、远端配置与最近一次同步结果。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "memory_sync_status",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.status.name",
+        "default": "查看记忆同步状态"
+      }
+    },
+    "git_memory.sync_memory_now": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.sync.description",
+        "default": "把 memory 目录的改动提交并推送到已关联的 Git 私有仓库。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "sync_memory_now",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.sync.name",
+        "default": "同步记忆到 Git"
+      }
+    },
+    "git_memory.ui_check_environment": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.check.description",
+        "default": "重新检测 Git、操作系统与 memory 目录的仓库状态。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_check_environment",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.check.name",
+        "default": "重新检测 Git 环境"
+      }
+    },
+    "git_memory.ui_clear_token": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.clearToken.description",
+        "default": "删除插件私有目录中保存的访问令牌。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_clear_token",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.clearToken.name",
+        "default": "清除访问令牌"
+      }
+    },
+    "git_memory.ui_connect_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.connect.description",
+        "default": "把 memory 目录关联到选定的已有仓库，并立即执行一次同步。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_connect_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "clone_url": {
+            "type": "string"
+          },
+          "repository": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "repository"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.connect.name",
+        "default": "关联已有仓库"
+      }
+    },
+    "git_memory.ui_create_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.create.description",
+        "default": "在选定的代码托管平台上创建私有仓库，关联 memory 目录并立即同步。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_create_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "private": {
+            "default": true,
+            "type": "boolean"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "name"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.create.name",
+        "default": "创建私有仓库并关联"
+      }
+    },
+    "git_memory.ui_disconnect_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.disconnect.description",
+        "default": "移除 memory 仓库的远端配置，本地提交历史与文件保持不变。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_disconnect_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "remove_token": {
+            "default": false,
+            "type": "boolean"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.disconnect.name",
+        "default": "解除远端关联"
+      }
+    },
+    "git_memory.ui_init_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.init.description",
+        "default": "在 memory 目录中执行 git init，并写入 .gitignore 与提交身份。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_init_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "author_email": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "gitignore_preset": {
+            "enum": [
+              "default",
+              "minimal",
+              "none"
+            ],
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.init.name",
+        "default": "初始化 memory 仓库"
+      }
+    },
+    "git_memory.ui_keep_local_version": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.keepLocal.description",
+        "default": "用本地 memory 目录的版本覆盖远端仓库。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_keep_local_version",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.keepLocal.name",
+        "default": "保留本地记忆版本"
+      }
+    },
+    "git_memory.ui_keep_remote_version": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.keepRemote.description",
+        "default": "用远端仓库的版本覆盖本地 memory 目录。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_keep_remote_version",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.keepRemote.name",
+        "default": "保留远端记忆版本"
+      }
+    },
+    "git_memory.ui_list_repositories": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.list.description",
+        "default": "列出访问令牌可写的仓库，供用户选择关联。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_list_repositories",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_url": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.list.name",
+        "default": "列出账号仓库"
+      }
+    },
+    "git_memory.ui_save_settings": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.saveSettings.description",
+        "default": "保存分支、提交信息模板、作者、代理、冲突策略与自动同步间隔等设置。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_save_settings",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "settings": {
+            "type": "object"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.saveSettings.name",
+        "default": "保存 Git 同步设置"
+      }
+    },
+    "git_memory.ui_save_token": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.token.description",
+        "default": "使用访问令牌调用代码托管平台接口校验账号，并加密保存到插件私有目录。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_save_token",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_url": {
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "github",
+              "gitlab",
+              "gitee"
+            ],
+            "type": "string"
+          },
+          "token": {
+            "minLength": 8,
+            "type": "string",
+            "writeOnly": true
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "provider",
+          "token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.token.name",
+        "default": "校验并保存访问令牌"
+      }
+    },
+    "git_memory.ui_set_auto_sync": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.autoSync.description",
+        "default": "开启或关闭自动同步，并设置 5 / 10 / 30 / 60 分钟的同步间隔。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_set_auto_sync",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "interval_minutes": {
+            "maximum": 1440,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.autoSync.name",
+        "default": "设置自动同步"
+      }
+    },
+    "git_memory:lifecycle:shutdown": {
+      "auto_start": false,
+      "description": "",
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "lifecycle",
+      "id": "shutdown",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "lifecycle",
+      "metadata": {},
+      "name": "shutdown"
+    },
+    "git_memory:lifecycle:startup": {
+      "auto_start": false,
+      "description": "",
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "lifecycle",
+      "id": "startup",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "lifecycle",
+      "metadata": {},
+      "name": "startup"
+    },
+    "git_memory:plugin_entry:memory_sync_status": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.status.description",
+        "default": "返回 memory 目录当前的 Git 状态、远端配置与最近一次同步结果。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "memory_sync_status",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.status.name",
+        "default": "查看记忆同步状态"
+      }
+    },
+    "git_memory:plugin_entry:sync_memory_now": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.sync.description",
+        "default": "把 memory 目录的改动提交并推送到已关联的 Git 私有仓库。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "sync_memory_now",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.sync.name",
+        "default": "同步记忆到 Git"
+      }
+    },
+    "git_memory:plugin_entry:ui_check_environment": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.check.description",
+        "default": "重新检测 Git、操作系统与 memory 目录的仓库状态。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_check_environment",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.check.name",
+        "default": "重新检测 Git 环境"
+      }
+    },
+    "git_memory:plugin_entry:ui_clear_token": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.clearToken.description",
+        "default": "删除插件私有目录中保存的访问令牌。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_clear_token",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.clearToken.name",
+        "default": "清除访问令牌"
+      }
+    },
+    "git_memory:plugin_entry:ui_connect_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.connect.description",
+        "default": "把 memory 目录关联到选定的已有仓库，并立即执行一次同步。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_connect_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "branch": {
+            "type": "string"
+          },
+          "clone_url": {
+            "type": "string"
+          },
+          "repository": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "repository"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.connect.name",
+        "default": "关联已有仓库"
+      }
+    },
+    "git_memory:plugin_entry:ui_create_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.create.description",
+        "default": "在选定的代码托管平台上创建私有仓库，关联 memory 目录并立即同步。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_create_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "private": {
+            "default": true,
+            "type": "boolean"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "name"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.create.name",
+        "default": "创建私有仓库并关联"
+      }
+    },
+    "git_memory:plugin_entry:ui_disconnect_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.disconnect.description",
+        "default": "移除 memory 仓库的远端配置，本地提交历史与文件保持不变。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_disconnect_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "remove_token": {
+            "default": false,
+            "type": "boolean"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.disconnect.name",
+        "default": "解除远端关联"
+      }
+    },
+    "git_memory:plugin_entry:ui_init_repository": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.init.description",
+        "default": "在 memory 目录中执行 git init，并写入 .gitignore 与提交身份。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_init_repository",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "author_email": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          },
+          "gitignore_preset": {
+            "enum": [
+              "default",
+              "minimal",
+              "none"
+            ],
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.init.name",
+        "default": "初始化 memory 仓库"
+      }
+    },
+    "git_memory:plugin_entry:ui_keep_local_version": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.keepLocal.description",
+        "default": "用本地 memory 目录的版本覆盖远端仓库。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_keep_local_version",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.keepLocal.name",
+        "default": "保留本地记忆版本"
+      }
+    },
+    "git_memory:plugin_entry:ui_keep_remote_version": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.keepRemote.description",
+        "default": "用远端仓库的版本覆盖本地 memory 目录。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_keep_remote_version",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.keepRemote.name",
+        "default": "保留远端记忆版本"
+      }
+    },
+    "git_memory:plugin_entry:ui_list_repositories": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.list.description",
+        "default": "列出访问令牌可写的仓库，供用户选择关联。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_list_repositories",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_url": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.list.name",
+        "default": "列出账号仓库"
+      }
+    },
+    "git_memory:plugin_entry:ui_save_settings": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.saveSettings.description",
+        "default": "保存分支、提交信息模板、作者、代理、冲突策略与自动同步间隔等设置。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_save_settings",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "settings": {
+            "type": "object"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.saveSettings.name",
+        "default": "保存 Git 同步设置"
+      }
+    },
+    "git_memory:plugin_entry:ui_save_token": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.token.description",
+        "default": "使用访问令牌调用代码托管平台接口校验账号，并加密保存到插件私有目录。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_save_token",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "base_url": {
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "github",
+              "gitlab",
+              "gitee"
+            ],
+            "type": "string"
+          },
+          "token": {
+            "minLength": 8,
+            "type": "string",
+            "writeOnly": true
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token",
+          "provider",
+          "token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.token.name",
+        "default": "校验并保存访问令牌"
+      }
+    },
+    "git_memory:plugin_entry:ui_set_auto_sync": {
+      "auto_start": false,
+      "description": {
+        "$i18n": "entry.autoSync.description",
+        "default": "开启或关闭自动同步，并设置 5 / 10 / 30 / 60 分钟的同步间隔。"
+      },
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "plugin_entry",
+      "id": "ui_set_auto_sync",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "interval_minutes": {
+            "maximum": 1440,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "ui_token": {
+            "minLength": 1,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "ui_token"
+        ],
+        "type": "object"
+      },
+      "kind": "service",
+      "metadata": {},
+      "name": {
+        "$i18n": "entry.autoSync.name",
+        "default": "设置自动同步"
+      }
+    },
+    "git_memory:timer:git_memory_auto_sync": {
+      "auto_start": true,
+      "description": "",
+      "dynamic": false,
+      "enabled": true,
+      "event_type": "timer",
+      "id": "git_memory_auto_sync",
+      "input_schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "timer",
+      "metadata": {
+        "seconds": 60
+      },
+      "name": "git_memory_auto_sync"
+    }
+  },
+  "schema_version": 3,
+  "sdk_version": "0.1.0",
+  "source_bytes": 1298085,
+  "source_files": [
+    ".github/workflows/release.yml",
+    ".github/workflows/verify.yml",
+    ".gitignore",
+    ".vscode/settings.json",
+    ".vscode/tasks.json",
+    "README.md",
+    "__init__.py",
+    "config.example.toml",
+    "docs/quickstart.md",
+    "git_backend.py",
+    "i18n/en.json",
+    "i18n/zh-CN.json",
+    "i18n/zh-TW.json",
+    "platform_info.py",
+    "plugin.toml",
+    "providers.py",
+    "pyproject.toml",
+    "ruff.toml",
+    "settings.py",
+    "storage.py",
+    "tests/conftest.py",
+    "tests/test_git_backend.py",
+    "tests/test_smoke.py",
+    "ui/panel.tsx",
+    "ui_actions.py",
+    "vendor/git/__init__.py",
+    "vendor/git/cmd.py",
+    "vendor/git/compat.py",
+    "vendor/git/config.py",
+    "vendor/git/db.py",
+    "vendor/git/diff.py",
+    "vendor/git/exc.py",
+    "vendor/git/index/__init__.py",
+    "vendor/git/index/base.py",
+    "vendor/git/index/fun.py",
+    "vendor/git/index/typ.py",
+    "vendor/git/index/util.py",
+    "vendor/git/objects/__init__.py",
+    "vendor/git/objects/base.py",
+    "vendor/git/objects/blob.py",
+    "vendor/git/objects/commit.py",
+    "vendor/git/objects/fun.py",
+    "vendor/git/objects/submodule/__init__.py",
+    "vendor/git/objects/submodule/base.py",
+    "vendor/git/objects/submodule/root.py",
+    "vendor/git/objects/submodule/util.py",
+    "vendor/git/objects/tag.py",
+    "vendor/git/objects/tree.py",
+    "vendor/git/objects/util.py",
+    "vendor/git/py.typed",
+    "vendor/git/refs/__init__.py",
+    "vendor/git/refs/head.py",
+    "vendor/git/refs/log.py",
+    "vendor/git/refs/reference.py",
+    "vendor/git/refs/remote.py",
+    "vendor/git/refs/symbolic.py",
+    "vendor/git/refs/tag.py",
+    "vendor/git/remote.py",
+    "vendor/git/repo/__init__.py",
+    "vendor/git/repo/base.py",
+    "vendor/git/repo/fun.py",
+    "vendor/git/types.py",
+    "vendor/git/util.py",
+    "vendor/gitdb-4.0.12.dist-info/AUTHORS",
+    "vendor/gitdb-4.0.12.dist-info/INSTALLER",
+    "vendor/gitdb-4.0.12.dist-info/LICENSE",
+    "vendor/gitdb-4.0.12.dist-info/METADATA",
+    "vendor/gitdb-4.0.12.dist-info/RECORD",
+    "vendor/gitdb-4.0.12.dist-info/WHEEL",
+    "vendor/gitdb-4.0.12.dist-info/top_level.txt",
+    "vendor/gitdb/__init__.py",
+    "vendor/gitdb/base.py",
+    "vendor/gitdb/const.py",
+    "vendor/gitdb/db/__init__.py",
+    "vendor/gitdb/db/base.py",
+    "vendor/gitdb/db/git.py",
+    "vendor/gitdb/db/loose.py",
+    "vendor/gitdb/db/mem.py",
+    "vendor/gitdb/db/pack.py",
+    "vendor/gitdb/db/ref.py",
+    "vendor/gitdb/exc.py",
+    "vendor/gitdb/fun.py",
+    "vendor/gitdb/pack.py",
+    "vendor/gitdb/stream.py",
+    "vendor/gitdb/test/__init__.py",
+    "vendor/gitdb/test/lib.py",
+    "vendor/gitdb/test/test_base.py",
+    "vendor/gitdb/test/test_example.py",
+    "vendor/gitdb/test/test_pack.py",
+    "vendor/gitdb/test/test_stream.py",
+    "vendor/gitdb/test/test_util.py",
+    "vendor/gitdb/typ.py",
+    "vendor/gitdb/util.py",
+    "vendor/gitdb/utils/__init__.py",
+    "vendor/gitdb/utils/encoding.py",
+    "vendor/gitpython-3.1.62.dist-info/INSTALLER",
+    "vendor/gitpython-3.1.62.dist-info/METADATA",
+    "vendor/gitpython-3.1.62.dist-info/RECORD",
+    "vendor/gitpython-3.1.62.dist-info/REQUESTED",
+    "vendor/gitpython-3.1.62.dist-info/WHEEL",
+    "vendor/gitpython-3.1.62.dist-info/licenses/AUTHORS",
+    "vendor/gitpython-3.1.62.dist-info/licenses/LICENSE",
+    "vendor/gitpython-3.1.62.dist-info/top_level.txt",
+    "vendor/smmap-5.0.3.dist-info/INSTALLER",
+    "vendor/smmap-5.0.3.dist-info/METADATA",
+    "vendor/smmap-5.0.3.dist-info/RECORD",
+    "vendor/smmap-5.0.3.dist-info/WHEEL",
+    "vendor/smmap-5.0.3.dist-info/licenses/LICENSE",
+    "vendor/smmap-5.0.3.dist-info/top_level.txt",
+    "vendor/smmap-5.0.3.dist-info/zip-safe",
+    "vendor/smmap/__init__.py",
+    "vendor/smmap/buf.py",
+    "vendor/smmap/mman.py",
+    "vendor/smmap/test/__init__.py",
+    "vendor/smmap/test/lib.py",
+    "vendor/smmap/test/test_buf.py",
+    "vendor/smmap/test/test_mman.py",
+    "vendor/smmap/test/test_tutorial.py",
+    "vendor/smmap/test/test_util.py",
+    "vendor/smmap/util.py"
+  ],
+  "source_sha256": "926174299fa675dbeaa0b55d5f75a9256e270c7fa253903d37a2bb1cc635c076"
+}

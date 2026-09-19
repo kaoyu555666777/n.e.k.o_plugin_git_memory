@@ -657,5 +657,76 @@ class GitMemoryUiMixin:
             }
         )
 
+    # --------------------------------------------------------- 远端版本决策
+    @ui.action(
+        id="ui_keep_remote_version",
+        label=tr("actions.keepRemote.label", default="保留远端版本"),
+        icon="⬇️",
+        tone="warning",
+        group="sync",
+        order=30,
+        confirm=tr(
+            "actions.keepRemote.confirm",
+            default="将用远端仓库的版本覆盖本地 memory 目录，本地尚未推送的提交会被丢弃，继续吗？",
+        ),
+        refresh_context=True,
+    )
+    @plugin_entry(
+        id="ui_keep_remote_version",
+        name=tr("entry.keepRemote.name", default="保留远端记忆版本"),
+        description=tr(
+            "entry.keepRemote.description",
+            default="用远端仓库的版本覆盖本地 memory 目录。",
+        ),
+        kind="service",
+        timeout=300.0,
+        input_schema={
+            "type": "object",
+            "properties": {"ui_token": {"type": "string", "writeOnly": True, "minLength": 1}},
+            "required": ["ui_token"],
+            "additionalProperties": False,
+        },
+    )
+    async def ui_keep_remote_version(self, ui_token: str = "", **_: object):
+        guard = self._ui_guard(ui_token)
+        if guard is not None:
+            return guard
+        return await self._resolve_remote_newer_choice("keep_remote")
+
+    @ui.action(
+        id="ui_keep_local_version",
+        label=tr("actions.keepLocal.label", default="保留本地版本"),
+        icon="⬆️",
+        tone="warning",
+        group="sync",
+        order=40,
+        confirm=tr(
+            "actions.keepLocal.confirm",
+            default="将用本地 memory 目录的版本覆盖远端仓库，远端上别人推送的提交会被丢弃，继续吗？",
+        ),
+        refresh_context=True,
+    )
+    @plugin_entry(
+        id="ui_keep_local_version",
+        name=tr("entry.keepLocal.name", default="保留本地记忆版本"),
+        description=tr(
+            "entry.keepLocal.description",
+            default="用本地 memory 目录的版本覆盖远端仓库。",
+        ),
+        kind="service",
+        timeout=300.0,
+        input_schema={
+            "type": "object",
+            "properties": {"ui_token": {"type": "string", "writeOnly": True, "minLength": 1}},
+            "required": ["ui_token"],
+            "additionalProperties": False,
+        },
+    )
+    async def ui_keep_local_version(self, ui_token: str = "", **_: object):
+        guard = self._ui_guard(ui_token)
+        if guard is not None:
+            return guard
+        return await self._resolve_remote_newer_choice("keep_local")
+
 
 __all__ = ["GitMemoryUiMixin", "SETTINGS_KEYS"]

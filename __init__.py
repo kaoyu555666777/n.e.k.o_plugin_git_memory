@@ -36,6 +36,9 @@ from .git_backend import (
     GitRepository,
     SyncOptions,
     detect_git,
+    proxy_appears_in,
+    resolve_git_proxy,
+    resolve_remote_newer,
     sync_repository,
 )
 from .platform_info import detect_platform
@@ -57,6 +60,9 @@ MAX_SCANNED_FILES = 5000
 STATUS_ENTRY_TIMEOUT = 60.0
 SYNC_ENTRY_TIMEOUT = 300.0
 NETWORK_ENTRY_TIMEOUT = 150.0
+# 同步线程的硬上限：入口超时是 300 秒，留出余量后即使 Git 被挂起也能把
+# 结果回给面板，而不是让「同步中…」一直转下去。
+SYNC_DEADLINE_SECONDS = 240.0
 
 
 @neko_plugin
@@ -125,6 +131,9 @@ class GitMemoryPlugin(GitMemoryUiMixin, NekoPluginBase):
         if not git_info.get("available"):
             return
         if not await asyncio.to_thread(self._is_repo_ready):
+            return
+        # 远端有新版本时已经停下等用户决定，不必每分钟再问一次远端。
+        if self._pending_choice():
             return
         if not self._sync_due(settings):
             return
@@ -294,9 +303,12 @@ class GitMemoryPlugin(GitMemoryUiMixin, NekoPluginBase):
                 "auto_sync_enabled": bool(settings.auto_sync_enabled),
                 "interval_minutes": int(settings.auto_sync_interval_minutes),
                 "interval_options": list(INTERVAL_OPTIONS),
+                "remote_update_policy": str(settings.remote_update_policy),
+                "proxy": self._proxy_info(settings),
                 "running": self._sync_lock.locked(),
                 "last_sync": last_sync if isinstance(last_sync, dict) else {},
                 "next_sync_at": self._next_sync_at(settings) if settings.auto_sync_enabled else "",
+                "pending_choice": self._pending_choice(),
             },
             "settings": settings.as_dict(),
             "gitignore_presets": list(GITIGNORE_PRESETS),
@@ -327,34 +339,66 @@ class GitMemoryPlugin(GitMemoryUiMixin, NekoPluginBase):
         repo = GitRepository(memory_dir)
         if not await asyncio.to_thread(repo.is_repo):
             return Err(SdkError("memory 目录还没有初始化 Git 仓库。", code="not_initialized"))
-        if not settings.repository.strip() and not await asyncio.to_thread(repo.remote_url, settings.remote_name):
-            return Err(SdkError("还没有关联远端仓库。", code="remote_missing"))
+        # 远端校验必须只看仓库里真实的 remote：settings.repository 只是上次
+        # 选择过的仓库名，重新初始化或解除关联后它会留下来，用它放行就会把
+        # 同步带进「没有远端却要 fetch/push」的死路。
+        remote_url = await asyncio.to_thread(repo.remote_url, settings.remote_name)
+        if not remote_url:
+            return Err(
+                SdkError(
+                    "还没有关联远端仓库：请先在「账号与仓库」里选择或创建一个私有仓库，再点击同步。",
+                    code="remote_missing",
+                )
+            )
 
-        auth = self._auth_for(settings)
-        options = SyncOptions(
-            remote_name=settings.remote_name,
-            branch=settings.branch,
-            commit_message=render_commit_message(settings.commit_message, changed_files=await asyncio.to_thread(repo.change_count)),
-            author_name=settings.author_name,
-            author_email=settings.author_email,
-            pull_before_push=settings.pull_before_push,
-            merge_strategy=settings.merge_strategy,
-            proxy_url=settings.proxy_url,
-            token=auth["token"],
-            username=auth["username"],
-        )
+        options = await self._build_sync_options(settings, repo)
         try:
-            report = await asyncio.to_thread(sync_repository, repo, options)
-        except GitError as exc:
-            await self._record_sync(trigger, {"status": "error", "code": exc.code, "message": str(exc), "detail": exc.detail})
+            report = await asyncio.wait_for(
+                asyncio.to_thread(sync_repository, repo, options),
+                timeout=SYNC_DEADLINE_SECONDS,
+            )
+        except asyncio.TimeoutError:
+            await self._record_sync(
+                trigger,
+                {
+                    "status": "error",
+                    "code": "timeout",
+                    "message": "同步超过等待上限仍未完成，已放弃等待。",
+                    "detail": "",
+                },
+            )
             if trigger == "auto" and settings.notify_on_error:
-                self._notify_user(f"记忆自动同步失败：{exc}")
-            return Err(SdkError(str(exc), code=exc.code))
+                self._notify_user("记忆自动同步超时，已放弃本次同步。")
+            return Err(SdkError("同步超过等待上限仍未完成，已放弃等待。", code="timeout"))
+        except GitError as exc:
+            message = self._network_hint(exc, settings)
+            proxy_info = self._proxy_info(settings)
+            await self._record_sync(
+                trigger,
+                {
+                    "status": "error",
+                    "code": exc.code,
+                    "message": message,
+                    "detail": exc.detail,
+                    "proxy": proxy_info["url"],
+                    "proxy_source": proxy_info["source"],
+                },
+            )
+            if trigger == "auto" and settings.notify_on_error:
+                self._notify_user(f"记忆自动同步失败：{message}")
+            return Err(SdkError(message, code=exc.code))
         except Exception as exc:  # pragma: no cover - defensive
             self.logger.exception("[Git Memory] 同步出现未预期错误")
             await self._record_sync(trigger, {"status": "error", "code": "unknown", "message": str(exc), "detail": ""})
             return Err(SdkError(f"同步失败：{exc}", code="unknown"))
 
+        if str(report.get("status") or "") == "pending_choice":
+            newly_detected = await self._set_pending_choice(report, trigger=trigger)
+            if trigger == "auto" and settings.notify_on_error and newly_detected:
+                self._notify_user(str(report.get("message") or "远端仓库有更新的版本，等待你选择保留哪一版。"))
+            return Ok(report)
+
+        await self._clear_pending_choice()
         report["trigger"] = trigger
         await self._record_sync(trigger, report)
         self.logger.info("[Git Memory] 同步完成：{}", report.get("message"))
@@ -367,6 +411,135 @@ class GitMemoryPlugin(GitMemoryUiMixin, NekoPluginBase):
         with self._settings_lock:
             self._runtime_state["last_sync"] = entry
         await self._state_store.update({"last_sync": entry})
+
+    async def _build_sync_options(self, settings: GitMemorySettings, repo: GitRepository) -> SyncOptions:
+        auth = self._auth_for(settings)
+        return SyncOptions(
+            remote_name=settings.remote_name,
+            branch=settings.branch,
+            commit_message=render_commit_message(
+                settings.commit_message,
+                changed_files=await asyncio.to_thread(repo.change_count),
+            ),
+            author_name=settings.author_name,
+            author_email=settings.author_email,
+            pull_before_push=settings.pull_before_push,
+            remote_update_policy=settings.remote_update_policy,
+            proxy_url=settings.proxy_url,
+            proxy_mode=settings.proxy_mode,
+            token=auth["token"],
+            username=auth["username"],
+        )
+
+    # ------------------------------------------------------- 远端版本待决状态
+    def _proxy_info(self, settings: GitMemorySettings) -> dict[str, str]:
+        info = resolve_git_proxy(settings.proxy_url, settings.proxy_mode)
+        return {
+            "mode": str(settings.proxy_mode),
+            "url": str(info.get("display") or ""),
+            "source": str(info.get("source") or ""),
+        }
+
+    def _network_hint(self, exc: GitError, settings: GitMemorySettings) -> str:
+        """Say which proxy the failing command actually used."""
+
+        message = str(exc)
+        if getattr(exc, "code", "") != "network_error":
+            return message
+        proxy = resolve_git_proxy(settings.proxy_url, settings.proxy_mode)
+        display = str(proxy.get("display") or "")
+        if not display:
+            return f"{message}（当前未使用代理：可在「Git 设置」里填写代理地址）"
+        if proxy_appears_in(getattr(exc, "detail", ""), display):
+            return (
+                f"代理连接失败（{display}）：git 连不上这个代理，"
+                f"请确认地址与端口，或在「Git 设置 → 代理模式」里改成直连后重试。原始信息：{message}"
+            )
+        return f"{message}（本次使用的代理：{display}；若代理不可用，可在「Git 设置 → 代理模式」改为直连）"
+
+    def _pending_choice(self) -> dict[str, Any]:
+        value = self._runtime_state.get("pending_choice") if isinstance(self._runtime_state, dict) else None
+        return dict(value) if isinstance(value, dict) else {}
+
+    async def _set_pending_choice(self, report: dict[str, Any], *, trigger: str = "") -> bool:
+        """Persist the "remote is newer, waiting for a decision" state.
+
+        Returns ``True`` when this is a *new* remote head, so the auto-sync path
+        notifies once per new version instead of once per tick.
+        """
+
+        head = report.get("remote_head") if isinstance(report.get("remote_head"), dict) else {}
+        relation = report.get("relation") if isinstance(report.get("relation"), dict) else {}
+        entry: dict[str, Any] = {
+            "code": str(report.get("code") or "remote_newer"),
+            "branch": str(report.get("branch") or ""),
+            "remote": str(report.get("remote") or ""),
+            "message": str(report.get("message") or ""),
+            "relation": relation,
+            "remote_head": head,
+            "detected_at": str(report.get("finished_at") or datetime.now(timezone.utc).isoformat()),
+            "trigger": trigger,
+        }
+        with self._settings_lock:
+            previous = self._pending_choice()
+            self._runtime_state["pending_choice"] = entry
+        await self._state_store.update({"pending_choice": entry})
+        previous_head = previous.get("remote_head") if isinstance(previous.get("remote_head"), dict) else {}
+        return bool(previous_head.get("sha") != head.get("sha") or previous.get("branch") != entry["branch"])
+
+    async def _clear_pending_choice(self) -> None:
+        with self._settings_lock:
+            removed = (
+                bool(self._runtime_state.pop("pending_choice", None))
+                if isinstance(self._runtime_state, dict)
+                else False
+            )
+        if removed:
+            await self._state_store.update({"pending_choice": {}})
+
+    async def _resolve_remote_newer_choice(self, choice: str):
+        """Run the user's keep_remote / keep_local decision."""
+
+        await self._ensure_loaded()
+        settings = self._settings
+        if not self._sync_lock.acquire(blocking=False):
+            return Err(SdkError("已有同步任务正在进行，请稍后再试。", code="sync_in_progress"))
+        try:
+            git_info = await self._git_info_cached()
+            if not git_info.get("available"):
+                return Err(
+                    SdkError(
+                        str(git_info.get("error") or "Git 不可用。"),
+                        code=str(git_info.get("error_code") or "git_missing"),
+                    )
+                )
+            repo = GitRepository(self.memory_dir())
+            if not await asyncio.to_thread(repo.is_repo):
+                return Err(SdkError("memory 目录还没有初始化 Git 仓库。", code="not_initialized"))
+            if not await asyncio.to_thread(repo.remote_url, settings.remote_name):
+                return Err(SdkError("还没有关联远端仓库。", code="remote_missing"))
+            options = await self._build_sync_options(settings, repo)
+            try:
+                report = await asyncio.wait_for(
+                    asyncio.to_thread(resolve_remote_newer, repo, options, choice),
+                    timeout=SYNC_DEADLINE_SECONDS,
+                )
+            except asyncio.TimeoutError:
+                return Err(SdkError("处理远端版本超过等待上限，请稍后重试。", code="timeout"))
+            except GitError as exc:
+                message = self._network_hint(exc, settings)
+                await self._record_sync(
+                    "resolve",
+                    {"status": "error", "code": exc.code, "message": message, "detail": exc.detail},
+                )
+                return Err(SdkError(message, code=exc.code))
+            await self._clear_pending_choice()
+            report["trigger"] = "resolve"
+            await self._record_sync("resolve", report)
+            self.logger.info("[Git Memory] 远端版本处理完成：{}", report.get("message"))
+            return Ok(report)
+        finally:
+            self._sync_lock.release()
 
     def _notify_user(self, text: str) -> None:
         try:

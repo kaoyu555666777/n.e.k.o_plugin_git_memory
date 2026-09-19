@@ -18,8 +18,10 @@ provider_base_url = ""
 auto_sync_enabled = false
 auto_sync_interval_minutes = 30
 pull_before_push = true
-merge_strategy = "ours"
+# 远端有新提交时怎么办：ask（每次询问）/ keep_local / keep_remote。
+remote_update_policy = "ask"
 proxy_url = ""
+proxy_mode = "auto"
 notify_on_error = true
 gitignore_preset = "default"
 gitignore_extra = ""

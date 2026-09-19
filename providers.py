@@ -88,8 +88,10 @@ PROVIDERS: dict[str, ProviderSpec] = {
         token_url="https://gitee.com/profile/personal_access_tokens",
         token_scopes=("projects",),
         token_note="私人令牌需要勾选 projects（仓库读写）范围，否则无法创建或推送私有仓库。",
-        signup_url="https://gitee.com/signup",
-        docs_url="https://help.gitee.com/account/personal-access-token",
+        signup_url="https://gitee.com/register",
+        # Gitee 的帮助中心已经撤掉了「私人令牌」文档（help.gitee.com/account/personal-access-token
+        # 现在 404），所以说明文档直接指向令牌管理页本身：那里有 Gitee 自己写的范围说明。
+        docs_url="https://gitee.com/profile/personal_access_tokens",
         supports_self_hosted=True,
         create_endpoint="/user/repos",
         list_endpoint="/user/repos",

@@ -98,15 +98,28 @@ type RepositoryView = {
   can_push?: boolean
 }
 type SyncStep = { id?: string; status?: string; detail?: string }
+type PendingChoice = {
+  code?: string
+  branch?: string
+  remote?: string
+  message?: string
+  relation?: { ahead?: number; behind?: number }
+  remote_head?: { ref?: string; sha?: string; short?: string; author?: string; subject?: string; committed_at?: string }
+  detected_at?: string
+  trigger?: string
+}
 type LastSync = {
   status?: string
   code?: string
   message?: string
+  detail?: string
   trigger?: string
   commit?: string
   changed_files?: number
   finished_at?: string
   steps?: SyncStep[]
+  relation?: { ahead?: number; behind?: number }
+  remote_head?: { sha?: string; short?: string; subject?: string; author?: string }
 }
 type SettingsView = {
   memory_dir?: string
@@ -121,8 +134,9 @@ type SettingsView = {
   auto_sync_enabled?: boolean
   auto_sync_interval_minutes?: number
   pull_before_push?: boolean
-  merge_strategy?: string
+  remote_update_policy?: string
   proxy_url?: string
+  proxy_mode?: string
   notify_on_error?: boolean
   gitignore_preset?: string
   gitignore_extra?: string
@@ -146,9 +160,12 @@ type GitMemoryPanelState = {
     auto_sync_enabled?: boolean
     interval_minutes?: number
     interval_options?: number[]
+    remote_update_policy?: string
+    proxy?: { mode?: string; url?: string; source?: string }
     running?: boolean
     next_sync_at?: string
     last_sync?: LastSync
+    pending_choice?: PendingChoice
   }
   settings?: SettingsView
   gitignore_presets?: string[]
@@ -165,9 +182,10 @@ type SettingsDraft = {
   author_name: string
   author_email: string
   proxy_url: string
+  proxy_mode: string
   pull_before_push: boolean
   notify_on_error: boolean
-  merge_strategy: string
+  remote_update_policy: string
   gitignore_preset: string
   gitignore_extra: string
 }
@@ -180,9 +198,10 @@ function settingsDraft(settings: SettingsView): SettingsDraft {
     author_name: String(settings.author_name || ""),
     author_email: String(settings.author_email || ""),
     proxy_url: String(settings.proxy_url || ""),
+    proxy_mode: String(settings.proxy_mode || "auto"),
     pull_before_push: settings.pull_before_push !== false,
     notify_on_error: settings.notify_on_error !== false,
-    merge_strategy: String(settings.merge_strategy || "ours"),
+    remote_update_policy: String(settings.remote_update_policy || "ask"),
     gitignore_preset: String(settings.gitignore_preset || "default"),
     gitignore_extra: String(settings.gitignore_extra || ""),
   }
@@ -238,13 +257,17 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
   const uiToken = String(state.ui_token || "")
   const can = (id: string) => !!uiToken && hasAction(actions, id)
   const providerId = String(auth.provider || serverSettings.provider || "")
-  const selectedProvider = providers.find((item) => item.id === providerId)
+  const firstProviderId = String(providers[0]?.id || "")
   const gitAvailable = !!git.available
   const gitChecked = Object.keys(git).length > 0
   const initialized = !!repo.initialized
+  const remoteLinked = !!repo.remote_url
   const tokenConfigured = !!auth.token_configured
   const syncRunning = !!sync.running
+  const pendingChoice = (sync.pending_choice || {}) as PendingChoice
+  const pendingChoiceKey = `${pendingChoice.code || ""}:${pendingChoice.remote_head?.sha || ""}`
   const lastSync = (sync.last_sync || {}) as LastSync
+  const proxyInfo = (sync.proxy || {}) as { mode?: string; url?: string; source?: string }
   const syncSteps = Array.isArray(lastSync.steps) ? lastSync.steps : []
   const install = os.install || {}
   const installLinks = Array.isArray(install.links) ? install.links : []
@@ -255,6 +278,7 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
   const [localError, setLocalError] = useState("")
   const [installOpen, setInstallOpen] = useState(false)
   const [installPrompted, setInstallPrompted] = useState(false)
+  const [choiceOpen, setChoiceOpen] = useState(false)
   const [tokenInput, setTokenInput] = useState("")
   const [providerChoice, setProviderChoice] = useState(providerId)
   const [baseUrl, setBaseUrl] = useState(String(auth.base_url || serverSettings.provider_base_url || ""))
@@ -269,9 +293,18 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
   const toast = useToast()
   const clipboard = useClipboard()
 
+  // 下拉框是「当前要操作的平台」的唯一真源。之前这里只认已经保存的
+  // provider，第一次打开面板时它还是空的，于是「创建访问令牌 / 注册账号 /
+  // 令牌说明文档」三个链接永远不会出现；选了平台也不刷新。
+  const selectedProvider = providers.find((item) => item.id === providerChoice) || providers[0]
+
   useEffect(() => {
-    setProviderChoice((current) => current || providerId)
-  }, [providerId])
+    setProviderChoice((current) => current || providerId || firstProviderId)
+  }, [providerId, firstProviderId])
+
+  useEffect(() => {
+    setChoiceOpen(Boolean(pendingChoiceKey && pendingChoiceKey !== ":"))
+  }, [pendingChoiceKey])
 
   useEffect(() => {
     setBaseUrl((current) => current || String(auth.base_url || serverSettings.provider_base_url || ""))
@@ -339,6 +372,24 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
       success: t("panel.toast.synced", "记忆目录同步完成。"),
       timeoutMs: 300000,
     })
+  }
+
+  async function keepRemoteVersion() {
+    const payload = await runAction({
+      actionId: "ui_keep_remote_version",
+      success: t("panel.toast.keepRemote", "已用远端版本覆盖本地记忆。"),
+      timeoutMs: 300000,
+    })
+    if (payload) setChoiceOpen(false)
+  }
+
+  async function keepLocalVersion() {
+    const payload = await runAction({
+      actionId: "ui_keep_local_version",
+      success: t("panel.toast.keepLocal", "已用本地版本覆盖远端仓库。"),
+      timeoutMs: 300000,
+    })
+    if (payload) setChoiceOpen(false)
   }
 
   async function initializeRepository() {
@@ -564,7 +615,7 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
             </Button>
             <Button
               tone="primary"
-              disabled={!!busy || syncRunning || !initialized || !can("sync_memory_now")}
+              disabled={!!busy || syncRunning || !initialized || !remoteLinked || !can("sync_memory_now")}
               onClick={syncNow}
             >
               {syncRunning || busy === "sync_memory_now"
@@ -586,6 +637,57 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
             />
           </ToolbarGroup>
         </Toolbar>
+
+        {initialized && !remoteLinked ? (
+          <Warning>
+            {t(
+              "panel.sync.remoteRequired",
+              "还没有关联远端仓库：请先在下方「账号与仓库」里选择或创建一个私有仓库，关联完成后再同步。",
+            )}
+          </Warning>
+        ) : null}
+
+        {pendingChoice.code ? (
+          <Warning>
+            <Stack>
+              <Text>{t("panel.sync.pending.title", "远端仓库有更新的版本")}</Text>
+              <Text>
+                {t(
+                  "panel.sync.pending.summary",
+                  "远端领先 {behind} 个提交，本地领先 {ahead} 个提交。请选择保留哪一版：保留远端会覆盖本地记忆，保留本地会覆盖远端仓库。",
+                  {
+                    behind: Number(pendingChoice.relation?.behind || 0),
+                    ahead: Number(pendingChoice.relation?.ahead || 0),
+                  },
+                )}
+              </Text>
+              {pendingChoice.remote_head?.short ? (
+                <Text>
+                  {t("panel.sync.pending.remoteHeadSummary", "远端最新提交：{short} {subject}", {
+                    short: pendingChoice.remote_head.short,
+                    subject: pendingChoice.remote_head.subject || "",
+                  })}
+                </Text>
+              ) : null}
+              <Inline>
+                <Button tone="warning" disabled={!!busy || !can("ui_keep_remote_version")} onClick={keepRemoteVersion}>
+                  {busyLabel(
+                    "ui_keep_remote_version",
+                    t("panel.sync.pending.keepRemote", "保留远端版本（覆盖本地）"),
+                    t("panel.actions.syncing", "同步中…"),
+                  )}
+                </Button>
+                <Button tone="warning" disabled={!!busy || !can("ui_keep_local_version")} onClick={keepLocalVersion}>
+                  {busyLabel(
+                    "ui_keep_local_version",
+                    t("panel.sync.pending.keepLocal", "保留本地版本（覆盖远端）"),
+                    t("panel.actions.syncing", "同步中…"),
+                  )}
+                </Button>
+              </Inline>
+            </Stack>
+          </Warning>
+        ) : null}
 
         <Card title={t("panel.git.title", "Git 环境")}>
           <Stack>
@@ -750,10 +852,27 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
                 },
                 { label: t("panel.sync.result", "结果"), value: lastSync.message || "—" },
                 { label: t("panel.sync.commit", "提交"), value: lastSync.commit || "—" },
+                {
+                  label: t("panel.sync.proxy", "当前代理"),
+                  value: proxyInfo.url
+                    ? proxyInfo.url
+                    : t("panel.sync.proxyNone", "未使用代理（直连）"),
+                },
               ]}
             />
             {lastSync.code ? (
               <Alert tone="danger">{`${lastSync.message || ""}（${lastSync.code}）`}</Alert>
+            ) : null}
+            {lastSync.detail ? (
+              <Field
+                label={t("panel.sync.detail", "Git 输出")}
+                help={t(
+                  "panel.sync.detailHelp",
+                  "上一次同步失败时 git 的原始输出（已隐去令牌），可据此判断是 DNS、证书、代理还是权限问题。",
+                )}
+              >
+                <CodeBlock>{String(lastSync.detail)}</CodeBlock>
+              </Field>
             ) : null}
             {syncSteps.length > 0 ? (
               <DataTable
@@ -834,7 +953,7 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
                   tone="info"
                 />
               ) : null}
-              {selectedProvider?.docs_url ? (
+              {selectedProvider?.docs_url && selectedProvider.docs_url !== selectedProvider.token_url ? (
                 <FileDownload
                   url={selectedProvider.docs_url}
                   label={t("panel.auth.docs", "令牌说明文档")}
@@ -1039,22 +1158,23 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
             </Field>
             <Grid cols={2}>
               <Field
-                label={t("panel.settings.mergeStrategy", "冲突处理")}
-                help={t("panel.settings.mergeStrategyHelp", "推送前拉取时如果历史分叉，保留本地记忆或中止同步。")}
+                label={t("panel.settings.remotePolicy", "远端有新版本时")}
+                help={t("panel.settings.remotePolicyHelp", "同步前发现远端有本地没有的提交时怎么办：默认每次询问你，也可以固定保留某一侧。")}
               >
                 <Select
-                  value={draft.merge_strategy}
+                  value={draft.remote_update_policy}
                   options={[
-                    { value: "ours", label: t("panel.settings.mergeOurs", "保留本地记忆（ours）") },
-                    { value: "abort", label: t("panel.settings.mergeAbort", "中止并提示（abort）") },
+                    { value: "ask", label: t("panel.settings.policyAsk", "每次询问我") },
+                    { value: "keep_local", label: t("panel.settings.policyKeepLocal", "总是保留本地版本") },
+                    { value: "keep_remote", label: t("panel.settings.policyKeepRemote", "总是保留远端版本") },
                   ]}
                   disabled={!!busy}
-                  onChange={(value: any) => patchDraft({ merge_strategy: String(value) })}
+                  onChange={(value: any) => patchDraft({ remote_update_policy: String(value) })}
                 />
               </Field>
               <Field
                 label={t("panel.settings.proxy", "网络代理")}
-                help={t("panel.settings.proxyHelp", "留空则跟随系统代理环境变量。")}
+                help={t("panel.settings.proxyHelp", "手动模式下使用这个地址，例如 http://127.0.0.1:7890。")}
               >
                 <Input
                   value={draft.proxy_url}
@@ -1064,6 +1184,24 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
                 />
               </Field>
             </Grid>
+            <Field
+              label={t("panel.settings.proxyMode", "代理模式")}
+              help={t(
+                "panel.settings.proxyModeHelp",
+                "git 不读取 Windows/macOS 的系统代理设置，所以这里默认「自动」：先用手动地址，其次应用环境变量，其次系统代理。开关过 N.E.K.O 的直连模式时会自动直连。",
+              )}
+            >
+              <SegmentedControl
+                value={draft.proxy_mode}
+                options={[
+                  { value: "auto", label: t("panel.settings.proxyAuto", "自动（推荐）") },
+                  { value: "manual", label: t("panel.settings.proxyManual", "只用手动地址") },
+                  { value: "off", label: t("panel.settings.proxyOff", "直连") },
+                ]}
+                disabled={!!busy}
+                onChange={(value: any) => patchDraft({ proxy_mode: String(value) })}
+              />
+            </Field>
             <Inline align="center" justify="space-between">
               <Switch
                 checked={draft.pull_before_push}
@@ -1131,6 +1269,94 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
             </Field>
           </Stack>
         </Card>
+
+        <Modal
+          open={choiceOpen && !!pendingChoice.code}
+          size="lg"
+          title={t("panel.sync.pending.title", "远端仓库有更新的版本")}
+          onClose={() => {
+            setChoiceOpen(false)
+          }}
+          footer={
+            <Inline justify="end">
+              <Button
+                tone="default"
+                disabled={!!busy}
+                onClick={() => {
+                  setChoiceOpen(false)
+                }}
+              >
+                {t("panel.sync.pending.later", "稍后决定")}
+              </Button>
+              <Button
+                tone="warning"
+                disabled={!!busy || !can("ui_keep_local_version")}
+                onClick={keepLocalVersion}
+              >
+                {busyLabel(
+                  "ui_keep_local_version",
+                  t("panel.sync.pending.keepLocal", "保留本地版本（覆盖远端）"),
+                  t("panel.actions.syncing", "同步中…"),
+                )}
+              </Button>
+              <Button
+                tone="primary"
+                disabled={!!busy || !can("ui_keep_remote_version")}
+                onClick={keepRemoteVersion}
+              >
+                {busyLabel(
+                  "ui_keep_remote_version",
+                  t("panel.sync.pending.keepRemote", "保留远端版本（覆盖本地）"),
+                  t("panel.actions.syncing", "同步中…"),
+                )}
+              </Button>
+            </Inline>
+          }
+        >
+          <Stack>
+            <Text>
+              {t(
+                "panel.sync.pending.detail",
+                "同步时发现远端 {branch} 分支上有 {behind} 个本地没有的提交（本地领先 {ahead} 个）。请选择保留哪一版：",
+                {
+                  branch: pendingChoice.branch || draft.branch,
+                  behind: Number(pendingChoice.relation?.behind || 0),
+                  ahead: Number(pendingChoice.relation?.ahead || 0),
+                },
+              )}
+            </Text>
+            <KeyValue
+              items={[
+                {
+                  label: t("panel.sync.pending.remoteHead", "远端最新提交"),
+                  value: pendingChoice.remote_head?.short
+                    ? `${pendingChoice.remote_head.short} ${pendingChoice.remote_head.subject || ""}`
+                    : "—",
+                },
+                {
+                  label: t("panel.sync.pending.remoteAuthor", "提交者"),
+                  value: pendingChoice.remote_head?.author || "—",
+                },
+                {
+                  label: t("panel.sync.pending.detectedAt", "检测时间"),
+                  value: formatTime(pendingChoice.detected_at),
+                },
+              ]}
+            />
+            <Warning>
+              {t(
+                "panel.sync.pending.keepRemoteNote",
+                "保留远端版本会用远端内容覆盖本地 memory 目录，本地尚未推送的提交会被丢弃。",
+              )}
+            </Warning>
+            <Warning>
+              {t(
+                "panel.sync.pending.keepLocalNote",
+                "保留本地版本会把本地提交强制推送到远端，远端上别人推送的提交会被覆盖。",
+              )}
+            </Warning>
+          </Stack>
+        </Modal>
 
         <Modal
           open={installOpen}

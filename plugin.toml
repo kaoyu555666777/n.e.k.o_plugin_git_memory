@@ -60,10 +60,12 @@ auto_sync_enabled = false
 auto_sync_interval_minutes = 30
 # 推送前先拉取远端。
 pull_before_push = true
-# 与远端历史冲突时的处理方式：ours（保留本地记忆）/ abort（中止并提示）。
-merge_strategy = "ours"
-# 网络代理，留空跟随系统环境变量。
+# 远端有本地没有的提交时怎么办：ask（每次询问）/ keep_local（总是保留本地）/ keep_remote（总是保留远端）。
+remote_update_policy = "ask"
+# 网络代理地址，仅代理模式为 manual 时强制使用。
 proxy_url = ""
+# 代理模式：auto（设置 → 应用环境变量 → 系统代理）/ manual（只用上面的地址）/ off（直连）。
+proxy_mode = "auto"
 # 自动同步失败时通过 HUD 提醒。
 notify_on_error = true
 # 初始化仓库时写入的 .gitignore 预设：default / minimal / none。
