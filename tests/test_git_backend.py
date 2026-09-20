@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import base64
 import subprocess
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import plugin.plugins.git_memory.git_backend as git_backend_module
 import pytest
@@ -244,16 +246,36 @@ def test_keep_remote_policy_resolves_without_asking(tmp_path: Path) -> None:
     assert (memory / "remote.txt").read_text(encoding="utf-8") == "from remote"
 
 
-@needs_git
-def test_git_command_timeout_is_enforced(tmp_path: Path) -> None:
-    memory = tmp_path / "memory"
-    memory.mkdir()
-    GitRepository.initialize(memory, branch="main")
+def test_git_command_timeout_kills_the_blocking_process(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """超时必须真的把卡住的进程结束掉。
 
-    with pytest.raises(GitError) as excinfo:
-        GitRepository(memory).git("--version", timeout=0.001)
+    不要用「跑一条很快的命令 + 极短超时」来测这个：在 Linux 的 CI 上
+    ``git --version`` 能在 1 毫秒内跑完，用例就会偶发地不抛异常（正是它把
+    release 流水线挂掉的那次）。这里改成让一个必定还在运行的进程充当 git 子进程，
+    超时该杀就杀，结果与机器快慢无关。
+    """
 
-    assert excinfo.value.code == "timeout"
+    process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    fake_repo = SimpleNamespace(
+        git=SimpleNamespace(
+            execute=lambda command, **kwargs: SimpleNamespace(proc=process),
+        )
+    )
+    monkeypatch.setattr(GitRepository, "repository", lambda self: fake_repo)
+
+    try:
+        with pytest.raises(GitError) as excinfo:
+            GitRepository(tmp_path).git("--version", timeout=0.5)
+
+        assert excinfo.value.code == "timeout"
+        assert process.poll() is not None, "超时后子进程必须已经被结束"
+    finally:
+        if process.poll() is None:  # pragma: no cover - only on a broken timeout path
+            process.kill()
+            process.wait(timeout=5)
 
 
 def test_gitignore_presets_and_commit_template() -> None:
@@ -294,7 +316,13 @@ def test_settings_validation_restores_defaults() -> None:
     assert accepted.auto_sync_interval_minutes == 60
 
 
-def test_platform_and_git_environment_helpers() -> None:
+def test_platform_and_git_environment_helpers(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # 结果只应该由参数决定，不受跑测试的机器上代理环境变量的影响。
+    for key in ("NO_PROXY", "no_proxy", *git_backend_module.PROXY_ENV_KEYS):
+        monkeypatch.delenv(key, raising=False)
+
     info = detect_platform()
     assert info["platform"] in {"windows", "macos", "linux"}
     assert info["install"]["commands"] or info["install"]["links"]

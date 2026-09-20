@@ -19,7 +19,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -44,7 +43,6 @@
         "type": "object"
       },
       "kind": "action",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -79,7 +77,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -117,7 +114,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -163,7 +159,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -210,7 +205,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -249,7 +243,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -301,7 +294,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -336,7 +328,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -371,7 +362,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -415,7 +405,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -453,7 +442,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -506,7 +494,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -549,7 +536,6 @@
         "type": "object"
       },
       "kind": "service",
-      "llm_result_fields": [],
       "llm_result_schema": {},
       "metadata": {},
       "model_validate": true,
@@ -588,17 +574,28 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "memory_sync_status",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.status.name",
         "default": "查看记忆同步状态"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory.sync_memory_now": {
       "auto_start": false,
@@ -609,17 +606,28 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "sync_memory_now",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "action",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.sync.name",
         "default": "同步记忆到 Git"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory.ui_check_environment": {
       "auto_start": false,
@@ -630,6 +638,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_check_environment",
       "input_schema": {
         "additionalProperties": false,
@@ -646,11 +655,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.check.name",
         "default": "重新检测 Git 环境"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory.ui_clear_token": {
       "auto_start": false,
@@ -661,6 +680,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_clear_token",
       "input_schema": {
         "additionalProperties": false,
@@ -680,11 +700,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.clearToken.name",
         "default": "清除访问令牌"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 30.0
     },
     "git_memory.ui_connect_repository": {
       "auto_start": false,
@@ -695,6 +725,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_connect_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -722,11 +753,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.connect.name",
         "default": "关联已有仓库"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory.ui_create_repository": {
       "auto_start": false,
@@ -737,6 +778,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_create_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -765,11 +807,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.create.name",
         "default": "创建私有仓库并关联"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory.ui_disconnect_repository": {
       "auto_start": false,
@@ -780,6 +832,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_disconnect_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -800,11 +853,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.disconnect.name",
         "default": "解除远端关联"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory.ui_init_repository": {
       "auto_start": false,
@@ -815,6 +878,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_init_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -848,11 +912,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.init.name",
         "default": "初始化 memory 仓库"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 120.0
     },
     "git_memory.ui_keep_local_version": {
       "auto_start": false,
@@ -863,6 +937,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_keep_local_version",
       "input_schema": {
         "additionalProperties": false,
@@ -879,11 +954,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.keepLocal.name",
         "default": "保留本地记忆版本"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory.ui_keep_remote_version": {
       "auto_start": false,
@@ -894,6 +979,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_keep_remote_version",
       "input_schema": {
         "additionalProperties": false,
@@ -910,11 +996,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.keepRemote.name",
         "default": "保留远端记忆版本"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory.ui_list_repositories": {
       "auto_start": false,
@@ -925,6 +1021,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_list_repositories",
       "input_schema": {
         "additionalProperties": false,
@@ -950,11 +1047,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.list.name",
         "default": "列出账号仓库"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 90.0
     },
     "git_memory.ui_save_settings": {
       "auto_start": false,
@@ -965,6 +1072,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_save_settings",
       "input_schema": {
         "additionalProperties": false,
@@ -984,11 +1092,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.saveSettings.name",
         "default": "保存 Git 同步设置"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory.ui_save_token": {
       "auto_start": false,
@@ -999,6 +1117,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_save_token",
       "input_schema": {
         "additionalProperties": false,
@@ -1033,11 +1152,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.token.name",
         "default": "校验并保存访问令牌"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 90.0
     },
     "git_memory.ui_set_auto_sync": {
       "auto_start": false,
@@ -1048,6 +1177,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_set_auto_sync",
       "input_schema": {
         "additionalProperties": false,
@@ -1072,11 +1202,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.autoSync.name",
         "default": "设置自动同步"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory:lifecycle:shutdown": {
       "auto_start": false,
@@ -1084,14 +1224,25 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "lifecycle",
+      "extra": {},
       "id": "shutdown",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "lifecycle",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
-      "name": "shutdown"
+      "model_validate": true,
+      "name": "shutdown",
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": null
     },
     "git_memory:lifecycle:startup": {
       "auto_start": false,
@@ -1099,14 +1250,25 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "lifecycle",
+      "extra": {},
       "id": "startup",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "lifecycle",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
-      "name": "startup"
+      "model_validate": true,
+      "name": "startup",
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": null
     },
     "git_memory:plugin_entry:memory_sync_status": {
       "auto_start": false,
@@ -1117,17 +1279,28 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "memory_sync_status",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.status.name",
         "default": "查看记忆同步状态"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory:plugin_entry:sync_memory_now": {
       "auto_start": false,
@@ -1138,17 +1311,28 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "sync_memory_now",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "action",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.sync.name",
         "default": "同步记忆到 Git"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory:plugin_entry:ui_check_environment": {
       "auto_start": false,
@@ -1159,6 +1343,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_check_environment",
       "input_schema": {
         "additionalProperties": false,
@@ -1175,11 +1360,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.check.name",
         "default": "重新检测 Git 环境"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory:plugin_entry:ui_clear_token": {
       "auto_start": false,
@@ -1190,6 +1385,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_clear_token",
       "input_schema": {
         "additionalProperties": false,
@@ -1209,11 +1405,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.clearToken.name",
         "default": "清除访问令牌"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 30.0
     },
     "git_memory:plugin_entry:ui_connect_repository": {
       "auto_start": false,
@@ -1224,6 +1430,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_connect_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -1251,11 +1458,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.connect.name",
         "default": "关联已有仓库"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory:plugin_entry:ui_create_repository": {
       "auto_start": false,
@@ -1266,6 +1483,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_create_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -1294,11 +1512,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.create.name",
         "default": "创建私有仓库并关联"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory:plugin_entry:ui_disconnect_repository": {
       "auto_start": false,
@@ -1309,6 +1537,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_disconnect_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -1329,11 +1558,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.disconnect.name",
         "default": "解除远端关联"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory:plugin_entry:ui_init_repository": {
       "auto_start": false,
@@ -1344,6 +1583,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_init_repository",
       "input_schema": {
         "additionalProperties": false,
@@ -1377,11 +1617,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.init.name",
         "default": "初始化 memory 仓库"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 120.0
     },
     "git_memory:plugin_entry:ui_keep_local_version": {
       "auto_start": false,
@@ -1392,6 +1642,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_keep_local_version",
       "input_schema": {
         "additionalProperties": false,
@@ -1408,11 +1659,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.keepLocal.name",
         "default": "保留本地记忆版本"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory:plugin_entry:ui_keep_remote_version": {
       "auto_start": false,
@@ -1423,6 +1684,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_keep_remote_version",
       "input_schema": {
         "additionalProperties": false,
@@ -1439,11 +1701,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.keepRemote.name",
         "default": "保留远端记忆版本"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 300.0
     },
     "git_memory:plugin_entry:ui_list_repositories": {
       "auto_start": false,
@@ -1454,6 +1726,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_list_repositories",
       "input_schema": {
         "additionalProperties": false,
@@ -1479,11 +1752,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.list.name",
         "default": "列出账号仓库"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 90.0
     },
     "git_memory:plugin_entry:ui_save_settings": {
       "auto_start": false,
@@ -1494,6 +1777,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_save_settings",
       "input_schema": {
         "additionalProperties": false,
@@ -1513,11 +1797,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.saveSettings.name",
         "default": "保存 Git 同步设置"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory:plugin_entry:ui_save_token": {
       "auto_start": false,
@@ -1528,6 +1822,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_save_token",
       "input_schema": {
         "additionalProperties": false,
@@ -1562,11 +1857,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.token.name",
         "default": "校验并保存访问令牌"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 90.0
     },
     "git_memory:plugin_entry:ui_set_auto_sync": {
       "auto_start": false,
@@ -1577,6 +1882,7 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "plugin_entry",
+      "extra": {},
       "id": "ui_set_auto_sync",
       "input_schema": {
         "additionalProperties": false,
@@ -1601,11 +1907,21 @@
         "type": "object"
       },
       "kind": "service",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {},
+      "model_validate": true,
       "name": {
         "$i18n": "entry.autoSync.name",
         "default": "设置自动同步"
-      }
+      },
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": 60.0
     },
     "git_memory:timer:git_memory_auto_sync": {
       "auto_start": true,
@@ -1613,30 +1929,48 @@
       "dynamic": false,
       "enabled": true,
       "event_type": "timer",
+      "extra": {
+        "mode": "interval",
+        "seconds": 60
+      },
       "id": "git_memory_auto_sync",
       "input_schema": {
         "properties": {},
         "type": "object"
       },
       "kind": "timer",
+      "llm_result_fields": null,
+      "llm_result_schema": null,
       "metadata": {
         "seconds": 60
       },
-      "name": "git_memory_auto_sync"
+      "model_validate": true,
+      "name": "git_memory_auto_sync",
+      "persist": null,
+      "quick_action": false,
+      "quick_action_config": {
+        "icon": null,
+        "priority": 0
+      },
+      "timeout": null
     }
   },
-  "schema_version": 3,
+  "schema_version": 4,
   "sdk_version": "0.1.0",
-  "source_bytes": 1298085,
+  "source_bytes": 1751570,
   "source_files": [
     ".github/workflows/release.yml",
     ".github/workflows/verify.yml",
     ".gitignore",
     ".vscode/settings.json",
     ".vscode/tasks.json",
+    "LICENSE",
     "README.md",
     "__init__.py",
     "config.example.toml",
+    "docs/1.png",
+    "docs/2.png",
+    "docs/3.png",
     "docs/quickstart.md",
     "git_backend.py",
     "i18n/en.json",
@@ -1654,6 +1988,7 @@
     "tests/test_smoke.py",
     "ui/panel.tsx",
     "ui_actions.py",
+    "vendor/.lock",
     "vendor/git/__init__.py",
     "vendor/git/cmd.py",
     "vendor/git/compat.py",
@@ -1697,6 +2032,7 @@
     "vendor/gitdb-4.0.12.dist-info/LICENSE",
     "vendor/gitdb-4.0.12.dist-info/METADATA",
     "vendor/gitdb-4.0.12.dist-info/RECORD",
+    "vendor/gitdb-4.0.12.dist-info/REQUESTED",
     "vendor/gitdb-4.0.12.dist-info/WHEEL",
     "vendor/gitdb-4.0.12.dist-info/top_level.txt",
     "vendor/gitdb/__init__.py",
@@ -1735,6 +2071,7 @@
     "vendor/smmap-5.0.3.dist-info/INSTALLER",
     "vendor/smmap-5.0.3.dist-info/METADATA",
     "vendor/smmap-5.0.3.dist-info/RECORD",
+    "vendor/smmap-5.0.3.dist-info/REQUESTED",
     "vendor/smmap-5.0.3.dist-info/WHEEL",
     "vendor/smmap-5.0.3.dist-info/licenses/LICENSE",
     "vendor/smmap-5.0.3.dist-info/top_level.txt",
@@ -1750,5 +2087,5 @@
     "vendor/smmap/test/test_util.py",
     "vendor/smmap/util.py"
   ],
-  "source_sha256": "926174299fa675dbeaa0b55d5f75a9256e270c7fa253903d37a2bb1cc635c076"
+  "source_sha256": "f055db15951ed9f55024a28f9de1b5172589b773e98552b86e7a1950313455b7"
 }
