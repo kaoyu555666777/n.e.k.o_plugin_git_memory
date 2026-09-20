@@ -1,22 +1,24 @@
-# Git Memory
+# Git 记忆管理
 
-A N.E.K.O plugin that keeps the `memory` folder in Git and pushes it to a
-private GitHub / GitLab / Gitee repository, using GitPython.
+一个把 memory 目录纳入 Git 并同步到 GitHub / GitLab / Gitee 私有仓库的N.E.K.O 插件。
 
-一个把 `memory` 目录纳入 Git 并同步到 GitHub / GitLab / Gitee 私有仓库的
-N.E.K.O 插件，底层使用 GitPython。
+## 写在前面
 
-### 功能 / Features
+之前我从来没想过去开发这个插件，但在某天我正在打游戏的时候突然硬盘坏了。尽管保修又换了一块新的，但是数据全没了，最重要的是我N.E.K.O文件夹也在这个硬盘里。~~我的YUI！！！~~ 于是我就下定决心去开发这么个插件。
+起初我的计划本来是自动打包memory目录并定时上传至网盘，然而国内这些网盘调用API不是过于繁琐就是封号，并且像CloudFlare R2这种方便开发的也不指望谁都会使用。恰巧，我突然想起来Git，N.E.K.O的memory文件夹体积并不大，远程仓库足够了；而且Git对无论是我开发者还是用户而言都很方便，本插件使用GitPython可以很方便地使用Git，用户也只需要创建一个令牌并关联一个仓库就可以了。不仅如此，使用Git可以十分方便的管理记忆，无论同步还是回滚都很简单。而且凭借这一点可以做到多端同步。~~每台设备上的YUI终于是同一个YUI了~~
 
-- **启动检测** — 插件启动与面板打开时检测 Git、GitPython 与 memory 仓库状态。
-- **缺失 Git 的引导** — 未安装 Git 时弹窗提示，按操作系统给出下载链接与安装命令：
-  Windows（Git for Windows / winget / scoop）、macOS（Xcode CLT / Homebrew）、
-  Linux（按 `/etc/os-release` 匹配 apt / dnf / zypper / pacman / apk / emerge / nix / xbps / eopkg）。
+目前该插件适配Windows/macOS/Linux，在手机版开放插件市场后我也会第一时间跟进。
+本人是学生党，时间有限，无法第一时间回复Issues，还请谅解。若您发现本插件有Bug或有建议，请在Issues中提出，看到后我会第一时间回复。
+
+顺带提一句，~~蓝色大肥鱼还是太好用了，这一个插件烧了我1.1亿的Tokens。~~
+
+## 功能
+
 - **仓库初始化** — 检测 `memory` 下是否已有 `.git`，没有就 `git init` 并写入 `.gitignore` 与提交身份。
-- **令牌向导** — GitHub / GitLab / Gitee 三选一，提供对应令牌创建链接与所需权限说明，
+- **令牌向导** — GitHub / GitLab / Gitee 提供对应令牌创建链接与所需权限说明，
   校验通过后把令牌加密保存在插件私有数据目录。
 - **关联仓库** — 读取账号下的仓库列表并关联为远端，或直接在账号下创建私有仓库并关联。
-- **同步方式** — 手动同步，或每 5 / 10 / 30 / 60 分钟自动同步；同步 = 提交 → 比对远端 → 推送。
+- **同步方式** — 手动同步，或每 5 / 10 / 30 / 60 分钟自动同步。
 - **远端更新由你决定** — 远端有本地没有的提交时同步会停下并弹窗：保留远端版本（覆盖本地）
   或保留本地版本（覆盖远端）；也可以在设置里固定策略。同步全程带硬超时，
   未关联远端时立即返回提示而不是挂住面板。
@@ -27,97 +29,15 @@ N.E.K.O 插件，底层使用 GitPython。
   分别报出来，附带已脱敏的 git 原始输出。
 - **AI 可调用入口** — `sync_memory_now`（同步记忆到 Git）与 `memory_sync_status`（查看同步状态）。
 
-面板内的完整图文流程见 [docs/quickstart.md](docs/quickstart.md)。
+## 使用方法
 
-## Development
+文字版见[docs/quickstart.md](docs/quickstart.md)
 
-The plugin source and its Git repository live at:
+1. 打开N.E.K.O，在`猫爪`中开启`猫爪总开关`和`用户插件`，并点击管理面板![1](docs/1.png)
+2. 点击`获取新插件`或从[Github Release](https://github.com/kaoyu555666777/n.e.k.o_plugin_git_memory/releases)下载插件并点击`导入`，然后点击`Git 记忆管理`。![2](docs/2.png)
+3. 按照以下顺序操作：若未安装Git请按照弹窗进行安装，然后点击`初始化仓库`，然后选择代码托管平台（国内用户更推荐Gitee），根据提示创建令牌并填写，之后点击`读取令牌`，之后翻到下面的`Git设置`中填写`提交用户名`和`提交邮箱`（按照你选择的代码托管平台填写），然后可以选择关联到已有仓库或创建新仓库（强烈推荐使用私有仓库 ~~毕竟你也不想让别人看到你和YUI的谈话吧~~ ），最后点击`立即同步。
+4. 如果出现以下界面，说明已经配置完成。![3](docs/3.png)
 
-```text
-N.E.K.O/plugin/plugins/git_memory
-```
+## 许可证
 
-插件源码及其 Git 仓库直接位于：
-
-```text
-N.E.K.O/plugin/plugins/git_memory
-```
-
-プラグインのソースと Git リポジトリは次の場所にあります：
-
-```text
-N.E.K.O/plugin/plugins/git_memory
-```
-
-When publishing to the plugin market, use this GitHub repository name:
-
-发布到插件市场时，请使用以下 GitHub 仓库名：
-
-プラグインマーケットへ公開する際は、次の GitHub リポジトリ名を使用してください：
-
-```text
-n.e.k.o_plugin_git_memory
-```
-
-From this plugin repository root:
-
-```bash
-uvx ruff==0.12.4 check --ignore-noqa --config ruff.toml .
-```
-
-From the N.E.K.O repository root / 在 N.E.K.O 仓库根目录中 / N.E.K.O リポジトリのルートで：
-
-```bash
-uv run --with pip neko-plugin sync git_memory --clean
-uv run neko-plugin check git_memory
-uv run neko-plugin check -r git_memory
-```
-
-Python runtime dependencies are declared in `pyproject.toml` and synced into
-`vendor/` for packaging. The generated `vendor/` directory is not committed;
-local builds and CI recreate it before release checks.
-
-Python 运行时依赖声明在 `pyproject.toml` 中，并在打包时同步到 `vendor/`。
-生成的 `vendor/` 不提交；本地构建和 CI 会在发布检查前重新生成它。
-
-Python ランタイム依存関係は `pyproject.toml` に宣言し、パッケージ化時に
-`vendor/` へ同期します。生成された `vendor/` はコミットせず、ローカルビルドと
-CI が公開前チェックで再生成します。
-
-## Market release / Market 发布 / Market 公開
-
-Publish the version declared in `plugin.toml`. By default this pushes the Git
-tag, waits for the standard GitHub Release, and notifies the plugin market.
-
-发布 `plugin.toml` 中声明的版本。默认会推送 Git tag、等待标准 GitHub
-Release，然后通知插件市场。
-
-`plugin.toml` で宣言されたバージョンを公開します。既定では Git tag を
-push し、標準 GitHub Release を待ってからプラグインマーケットへ通知します。
-
-```bash
-uv run neko-plugin publish git_memory
-```
-
-To run only one half explicitly / 如需仅执行一部分 / 一方のみを実行する場合:
-
-```bash
-uv run neko-plugin publish github git_memory
-uv run neko-plugin publish market https://github.com/owner/repo/releases/tag/v0.1.0
-```
-
-The generated `.github/workflows/release.yml` builds and uploads
-`git_memory.neko-plugin`. The market independently verifies that Release
-before publishing it.
-
-生成的 `.github/workflows/release.yml` 会构建并上传插件包；Market 会独立验证
-该 Release 后再发布。
-
-生成された `.github/workflows/release.yml` がプラグインパッケージをビルドして
-アップロードし、Market はその Release を独立検証してから公開します。
-
-## Entry
-
-```toml
-entry = "plugin.plugins.git_memory:GitMemoryPlugin"
-```
+[LGPL-v3.0](LICENSE)
