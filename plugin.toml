@@ -5,7 +5,7 @@ name = "Git 记忆同步"
 description = "使用 GitPython 把 N.E.K.O 的记忆目录同步到 GitHub / GitLab / Gitee 的私有仓库，支持定时自动同步与手动同步。"
 short_description = "用 Git 把记忆目录备份并同步到 GitHub / GitLab / Gitee 私有仓库。"
 
-version = "0.1.0"
+version = "0.1.1"
 entry = "plugin.plugins.git_memory:GitMemoryPlugin"
 
 [plugin.sdk]
