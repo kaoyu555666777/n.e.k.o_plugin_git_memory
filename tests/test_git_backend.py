@@ -13,9 +13,13 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-import pytest
-
+# 注意：market CI、`neko-plugin publish` 与本地检查都以插件仓库根为工作目录
+# 运行 ruff（--isolated / --config ruff.toml），那里不存在 `plugin/` 包，
+# 所以 `plugin.*` 按第三方导入排序——必须与 pytest 同块连续、且排在 pytest
+# 之前（字母序 plugin < pytest）。不要在 N.E.K.O 仓库根目录下用 src 探测
+# 重排这里的导入（那里 `plugin` 会被识别为一方导入，排出来反而过不了 CI）。
 import plugin.plugins.git_memory.git_backend as git_backend_module
+import pytest
 from plugin.plugins.git_memory.git_backend import (
     GitError,
     GitRepository,
