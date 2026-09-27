@@ -13,8 +13,9 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-import plugin.plugins.git_memory.git_backend as git_backend_module
 import pytest
+
+import plugin.plugins.git_memory.git_backend as git_backend_module
 from plugin.plugins.git_memory.git_backend import (
     GitError,
     GitRepository,
@@ -244,6 +245,30 @@ def test_keep_remote_policy_resolves_without_asking(tmp_path: Path) -> None:
 
     assert report["status"] == "ok"
     assert (memory / "remote.txt").read_text(encoding="utf-8") == "from remote"
+
+
+@needs_git
+def test_sync_falls_back_to_current_branch_when_configured_branch_missing(tmp_path: Path) -> None:
+    """配置分支在本地不存在时必须退回当前分支，而不是报 src refspec 错误。"""
+
+    memory = tmp_path / "memory"
+    memory.mkdir()
+    (memory / "a.txt").write_text("local", encoding="utf-8")
+    bare = make_remote(tmp_path)
+    # 旧仓库停在 master；设置里仍是默认的 main。
+    GitRepository.initialize(
+        memory,
+        branch="master",
+        author_name="NEKO Test",
+        author_email="test@example.com",
+    )
+    GitRepository(memory).set_remote("origin", bare.as_uri())
+
+    report = sync_repository(GitRepository(memory), make_options(branch="main"))
+
+    assert report["status"] == "ok"
+    assert report["branch"] == "master"
+    assert remote_log(bare, "master")
 
 
 def test_git_command_timeout_kills_the_blocking_process(

@@ -888,6 +888,22 @@ def _remote_newer_report(
     }
 
 
+def _resolve_working_branch(repo: GitRepository, configured: str) -> str:
+    """配置的分支在本地不存在时退回仓库当前分支。
+
+    ``plugin.toml`` 默认 main，而插件初始化之前的旧仓库可能停在 master 或
+    其他分支上；这时仍按配置推送 ``refs/heads/main`` 只会得到一条 "src
+    refspec does not match any" 的未知错误，退回当前分支才能真的完成同步。
+    """
+
+    branch = configured.strip() or repo.current_branch() or DEFAULT_BRANCH
+    if branch and not repo.ref_exists(f"refs/heads/{branch}"):
+        existing = repo.current_branch()
+        if existing and existing != branch:
+            return existing
+    return branch
+
+
 def sync_repository(repo: GitRepository, options: SyncOptions) -> dict[str, object]:
     """Commit local changes, compare with the remote, then push.
 
@@ -900,7 +916,7 @@ def sync_repository(repo: GitRepository, options: SyncOptions) -> dict[str, obje
     if not repo.is_repo():
         raise GitError("not_initialized")
 
-    branch = options.branch.strip() or repo.current_branch() or DEFAULT_BRANCH
+    branch = _resolve_working_branch(repo, options.branch)
     remote_name = options.remote_name.strip() or DEFAULT_REMOTE
     remote_url = repo.remote_url(remote_name)
     if not remote_url:
@@ -1018,7 +1034,7 @@ def resolve_remote_newer(repo: GitRepository, options: SyncOptions, choice: str)
     if not repo.is_repo():
         raise GitError("not_initialized")
 
-    branch = options.branch.strip() or repo.current_branch() or DEFAULT_BRANCH
+    branch = _resolve_working_branch(repo, options.branch)
     remote_name = options.remote_name.strip() or DEFAULT_REMOTE
     remote_url = repo.remote_url(remote_name)
     if not remote_url:

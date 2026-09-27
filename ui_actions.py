@@ -60,7 +60,13 @@ class GitMemoryUiMixin:
         token = str(entry.get("token") or "")
         if not token:
             raise ProviderError("invalid_token", message="请先填写并校验访问令牌。")
-        resolved_base = base_url.strip() or str(entry.get("base_url") or "") or self._settings.provider_base_url
+        resolved_base = base_url.strip() or str(entry.get("base_url") or "")
+        if not resolved_base:
+            spec = PROVIDERS.get(provider_id)
+            # 全局的 provider_base_url 是给某个自建平台留的；GitHub 这类
+            # 不支持自建的平台不能继承它，否则客户端会被指到别家域名。
+            if spec is not None and spec.supports_self_hosted:
+                resolved_base = self._settings.provider_base_url
         return ProviderClient(
             provider_id=provider_id,
             token=token,
@@ -240,7 +246,9 @@ class GitMemoryUiMixin:
         provider_id = str(provider or "").strip().lower()
         try:
             spec = get_provider(provider_id)
-            resolved_base = normalize_base_url(provider_id, base_url)
+            # 不支持自建站点的平台直接忽略传入的站点地址（面板上这个输入框
+            # 只对 GitLab / Gitee 显示，但旧的输入内容仍会被发上来）。
+            resolved_base = normalize_base_url(provider_id, base_url if spec.supports_self_hosted else "")
         except ProviderError as exc:
             return Err(SdkError(str(exc), code=exc.code))
         client = ProviderClient(

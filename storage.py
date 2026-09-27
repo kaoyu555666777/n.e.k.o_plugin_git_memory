@@ -54,25 +54,40 @@ class StateStore:
         self.path = Path(data_dir) / "state.json"
         self._lock = threading.Lock()
 
+    def _read_unlocked(self) -> dict[str, Any]:
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except (OSError, ValueError, UnicodeError):
+            return {}
+        return payload if isinstance(payload, dict) else {}
+
+    def _write_unlocked(self, document: Mapping[str, Any]) -> dict[str, Any]:
+        data = dict(document)
+        try:
+            _atomic_write_bytes(
+                self.path,
+                json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8"),
+            )
+        except OSError as exc:
+            raise StorageError(f"无法写入插件状态文件：{exc}") from exc
+        return data
+
     def load_sync(self) -> dict[str, Any]:
         with self._lock:
-            try:
-                payload = json.loads(self.path.read_text(encoding="utf-8"))
-            except (OSError, ValueError, UnicodeError):
-                return {}
-            return payload if isinstance(payload, dict) else {}
+            return self._read_unlocked()
 
     def save_sync(self, state: Mapping[str, Any]) -> dict[str, Any]:
-        document = dict(state)
         with self._lock:
-            try:
-                _atomic_write_bytes(
-                    self.path,
-                    json.dumps(document, ensure_ascii=False, indent=2).encode("utf-8"),
-                )
-            except OSError as exc:
-                raise StorageError(f"无法写入插件状态文件：{exc}") from exc
-        return document
+            return self._write_unlocked(state)
+
+    def update_sync(self, patch: Mapping[str, Any]) -> dict[str, Any]:
+        # 读-改-写必须在同一把锁内完成：记录 last_sync、写 pending_choice、
+        # 保存检测结果这些调用互相并发，分开的 load()/save() 会让后落盘的
+        # 一方基于同一份旧快照整体覆盖，把先落盘一方的键整个抹掉。
+        with self._lock:
+            current = self._read_unlocked()
+            current.update(dict(patch))
+            return self._write_unlocked(current)
 
     async def load(self) -> dict[str, Any]:
         return await asyncio.to_thread(self.load_sync)
@@ -81,9 +96,7 @@ class StateStore:
         return await asyncio.to_thread(self.save_sync, state)
 
     async def update(self, patch: Mapping[str, Any]) -> dict[str, Any]:
-        current = await self.load()
-        current.update(dict(patch))
-        return await self.save(current)
+        return await asyncio.to_thread(self.update_sync, patch)
 
 
 class SecretStore:

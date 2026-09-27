@@ -169,7 +169,12 @@ class ProviderClient:
 
     def __post_init__(self) -> None:
         self.spec = get_provider(self.provider_id)
-        self.site_url = normalize_base_url(self.spec.id, self.base_url)
+        # 不支持自建站点的平台（github.com）必须钉死在官方地址：否则上一个
+        # 平台留下的 provider_base_url 会把 GitHub 客户端指到别家的域名上。
+        if self.spec.supports_self_hosted:
+            self.site_url = normalize_base_url(self.spec.id, self.base_url)
+        else:
+            self.site_url = self.spec.site_url
         if self.site_url == self.spec.site_url:
             self.api_base = self.spec.api_base
         else:

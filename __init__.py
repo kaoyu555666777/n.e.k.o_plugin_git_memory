@@ -636,7 +636,10 @@ def _count_files(root: Path) -> int:
     total = 0
     try:
         for path in root.rglob("*"):
-            if path.name == ".git":
+            # 只比较 name 跳不过 .git 的内容：目录项本身不是文件不会计数，
+            # 而 HEAD / objects / pack 的 name 都不是 ".git"，会把成千上万个
+            # Git 内部文件全部算进去。必须按相对路径把整棵 .git 子树剪掉。
+            if ".git" in path.relative_to(root).parts:
                 continue
             if path.is_file():
                 total += 1

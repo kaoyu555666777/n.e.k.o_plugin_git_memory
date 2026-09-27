@@ -422,7 +422,13 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
     }
     const payload = await runAction({
       actionId: "ui_save_token",
-      args: { provider: providerChoice, token: value, base_url: baseUrl.trim() },
+      // 自建站点地址只对支持自建的平台有意义；切到 GitHub 这类平台时
+      // 不能把上一个平台留下的地址一起发上去。
+      args: {
+        provider: providerChoice,
+        token: value,
+        base_url: selectedProvider?.supports_self_hosted ? baseUrl.trim() : "",
+      },
       success: t("panel.toast.tokenSaved", "访问令牌校验通过，已加密保存。"),
       timeoutMs: 90000,
     })
@@ -452,7 +458,11 @@ export default function GitMemoryPanel(props: PluginSurfaceProps<GitMemoryPanelS
     try {
       const payload = await callAction(
         "ui_list_repositories",
-        { provider: providerChoice, base_url: baseUrl.trim(), query: repositoryQuery.trim() },
+        {
+          provider: providerChoice,
+          base_url: selectedProvider?.supports_self_hosted ? baseUrl.trim() : "",
+          query: repositoryQuery.trim(),
+        },
         90000,
       )
       const items = Array.isArray(payload.repositories) ? (payload.repositories as RepositoryView[]) : []
